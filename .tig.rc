@@ -1,0 +1,26 @@
+# author-width           ## Width of the author column. int value.
+# filename-width         ## Width of the filename column. int value.
+# id-width               ## Width of the commit ID. int value.
+# blame-options          ## A space separated string of extra blame options. string value.
+# line-graphics          ## What type of character graphics for line drawing. mixed value.
+# line-number-interval   ## Interval between line numbers. int value.
+# horizontal-scroll      ## Interval to scroll horizontally in each step. mixed value.
+# read-git-colors        ## Whether to read git’s color settings. bool value.
+# show-author            ## How to display author names. mixed value.
+# show-filename          ## When to display file names. mixed value.
+# show-date              ## Whether and how to show date. mixed value.
+# show-notes             ## Show notes for a commit. mixed value.
+# show-refs              ## Show references in the main view on start-up. bool value.
+# show-id                ## Show commit IDs in the main view. bool value.
+# show-rev-graph         ## Show revision graph in the main view on start-up. bool value.
+# show-changes           ## Show staged and unstaged changes in the main view. bool value.
+# vertical-split         ## Split the view horizontally or vertically. bool value.
+# split-view-height      ## Height of the lower view in a split view. mixed value.
+# status-untracked-dirs  ## Show untracked directories contents in the status view. bool value.
+# tab-size               ## Number of spaces per tab. Default is 8. int value.
+# diff-context           ## Number of context lines to show for diffs. int value.
+# ignore-space           ## Ignore space changes in diff view. mixed value.
+# commit-order           ## Commit ordering. mixed value.
+# ignore-case            ## Ignore case in searches. bool value.
+# wrap-lines             ## Wrap long lines. bool value.
+# focus-child            ## Whether to focus the child view when it is opened. bool value.

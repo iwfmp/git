@@ -1,0 +1,113 @@
+[user]
+	name = Elad Rom
+	email = webdev@eladrom.org
+
+[push]
+	default = tracking
+
+[core]
+	editor = vim
+	excludesfile = ~/git/.global-gitignore
+
+[merge]
+	tool = vimdiff
+
+[branch]
+	autosetupmerge = true
+
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red bold
+	new = green bold
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+
+[alias]
+	# git flow aliases
+	ffs = flow feature start
+	fff = flow feature finish
+	frs = flow release start
+	frf = flow release finish
+	fhs = flow hotfix start
+	fhf = flow hotfix finish
+
+	# basic aliases
+    s = status
+    k = !gitk
+    c = commit
+    ca = commit -a
+    rh = reset --hard HEAD
+    rs = reset --soft HEAD
+    p = !"git current | git pull origin"
+    pull = !"git current | git pull origin"
+    push = !"git current | git push origin"
+    push-and-pull = !"git current | git pull origin && git current | git push origin"
+
+	# undoing
+	unstage = reset HEAD --
+	undo-push = git push -f origin HEAD^:master
+	detach = checkout HEAD^0 #go to a detached-HEAD mode
+
+	# stashing
+	stash-unapply = !git stash show -p | git apply -R #unapply the most recent stash
+	stash-show = !git show $(git stash list | cut -d":"  -f 1) #shows the contents of each stash with one command.
+
+	# ignoring files
+	ignore = !git update-index --assume-unchanged #temporeraly ignore files. use with your own risk!
+	ignore-undo = !git update-index --no-assume-unchanged #unignore ignored files bla
+	ignore-list = !git ls-files -v | grep ^[a-z] | colrm 1 2 #list ignored files
+
+	# log stuff
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	lg-heads = !"git log origin/master.. --format='%Cred%h%Creset;%C(yellow)%an%Creset;%H;%Cgreen%f%Creset' | git name-rev --stdin --always --name-only | column -t -s';' | more"
+
+	# Information gathering
+	current = rev-parse --abbrev-ref HEAD
+	diff-inline = git diff --word-diff #Diff by highlighting inline word
+	diff-changes = !git whatchanged $1.. | grep commit | colrm 1 7 | xargs -I % git show % $1 # Shows the diff in files between a treeish and HEAD
+	show-files = !git show --pretty="format:" --name-only $1 #Show the indexed modified files in a specific git commit
+ 	show-files-2 = !git diff --name-status $1 $1~ #Dido, with status of modified/deleted etc...
+
+	# remote thingies
+	checkout-rebase-merge = git rebase HEAD feature && git rebase HEAD @{-2} #Checkout a branch, rebase and merge
+	pending = !git --no-pager log origin/master..master && echo # fetched changes waiting to be merged
+	check-origin = !sh git pull --dry-run origin | grep -q -v \"Already up-to-date.\" && changed=1 # changed files waiting to be pulled from remote
+	check-prune = !git remote | xargs -n 1 git remote prune
+	serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+	track = !sh -c 'git branch --track "$0" "origin/$0" && git checkout "$0"'
+
+	# conflict solving
+	# warning! there will be conflicts!
+	# choose your destiny -
+	# 1. abort this bullshit. I'm getting myself some coffee...
+	# 2. ok, show me the diff... interactively please!
+	# 3. prompt me - choose mine (of course), theirs (never!), or edit (sometimes the compromise is best)?
+	lc = log ORIG_HEAD.. --stat --no-merges
+	k-conflict = !gitk --left-right HEAD...MERGE_HEAD
+	#take-e = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`" #2.5
+	#take-m = #2.5
+	#take-t = #2.5
+	resolve = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`" #3
+
+	# updating
+	up = !git pull --rebase && git push # pull, rebase, push
+	subup = submodule foreach git pull origin master #update all submodules in a git repo
+	subclean = submodule foreach git clean -fd #update all submodules in a git repo
+
+	# cleaning around
+	find-lost = !"git fsck | awk '/dangling commit/ {print $3}' | git show --format='SHA1: %C(yellow)%h%Creset %f' --stdin | awk '/SHA1/ {sub(\"SHA1: \", \"\"); print}'" #find all dangling objects
+	clear-hardcore = !git reflog expire --expire=1.month refs/heads/master | git fsck --unreachable | git prune | git gc
+	clear-untracked = clean -fd #delete all untracked files
+
+	#misc
+	#edit gitconfig ( I'm too lazy to actually type it )
+

@@ -1,0 +1,2 @@
+ln -s .gitconfig ~/.gitconfig
+ln -s .tig.rc ~/.tig.rc

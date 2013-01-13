@@ -1,0 +1,5 @@
+# Finds commits that introduced or removed a given string
+# $1 - the string to search for
+# $2 - look only in a specific file
+# Prints the file name, commit and line number
+git grep -n "$1" $(git log -g --pretty=format:%h -S"$1") $2
