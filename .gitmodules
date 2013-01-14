@@ -10,3 +10,6 @@
 [submodule "lib/git-slave"]
 	path = lib/git-slave
 	url = git://gitslave.git.sourceforge.net/gitroot/gitslave/gitslave
+[submodule "lib/git-flow"]
+	path = lib/git-flow
+	url = https://github.com/nvie/gitflow.git
