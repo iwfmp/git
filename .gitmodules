@@ -7,3 +7,6 @@
 [submodule "lib/git-hooks"]
 	path = lib/git-hooks
 	url = https://github.com/icefox/git-hooks.git
+[submodule "lib/git-slave"]
+	path = lib/git-slave
+	url = git://gitslave.git.sourceforge.net/gitroot/gitslave/gitslave
