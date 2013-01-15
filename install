@@ -1,2 +1,16 @@
+#!/bin/bash
+
+# Link configuration to $HOME directory.
 ln -s .gitconfig ~/.gitconfig
 ln -s .tig.rc ~/.tig.rc
+
+# Install program and dependencies, if doesn't yet exist.
+evnDependencies="git tig"
+for evnDependency in $evnDependencies; do
+	if [[ -z `command -v ${evnDependency}` ]]; then
+		sudo apt-get install -y ${evnDependency}
+	fi
+done
+
+# Install libraries
+./lib/git-flow/contrib/gitflow-installer.sh
