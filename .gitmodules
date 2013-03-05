@@ -13,3 +13,6 @@
 [submodule "lib/git-flow"]
 	path = lib/git-flow
 	url = https://github.com/nvie/gitflow.git
+[submodule "lib/git-flow-completion"]
+	path = lib/git-flow-completion
+	url = https://github.com/bobthecow/git-flow-completion.git
