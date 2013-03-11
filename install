@@ -9,8 +9,8 @@ for evnDependency in $evnDependencies; do
 done
 
 # Link configurations
-ln -s .gitconfig $HOME/.gitconfig
-ln -s .tig.rc $HOME/.tig.rc
+ln -s $HOME/.gitl/.gitconfig $HOME/.gitconfig
+ln -s $HOME/.gitl/.tig.rc $HOME/.tig.rc
 
 # Install libraries
 sudo bash lib/git-flow/contrib/gitflow-installer.sh
