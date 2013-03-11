@@ -13,6 +13,8 @@ ln -s $HOME/.gitl/.gitconfig $HOME/.gitconfig
 ln -s $HOME/.gitl/.tig.rc $HOME/.tig.rc
 
 # Install libraries
-sudo bash lib/git-flow/contrib/gitflow-installer.sh
+cd /usr/local/share
+sudo bash $HOME/.gitl/lib/git-flow/contrib/gitflow-installer.sh
+cd -
 
 # add this to .zshrc: "source ~/.git-flow-completion.zsh"
