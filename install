@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install program and dependencies, if doesn't yet exist.
-evnDependencies="git tig"
+evnDependencies="tig"
 for evnDependency in $evnDependencies; do
 	if [[ -z `command -v ${evnDependency}` ]]; then
 		sudo apt-get install -y ${evnDependency}
@@ -9,12 +9,10 @@ for evnDependency in $evnDependencies; do
 done
 
 # Link configurations
-ln -s $HOME/.gitl/.gitconfig $HOME/.gitconfig
-ln -s $HOME/.gitl/.tig.rc $HOME/.tig.rc
+ln -s $HOME/.git.d/.gitconfig $HOME/.gitconfig
+ln -s $HOME/.git.d/.tig.rc $HOME/.tig.rc
 
 # Install libraries
-cd /usr/local/share
-sudo bash $HOME/.gitl/lib/git-flow/contrib/gitflow-installer.sh
-cd -
+sudo apt-get install git-flow
 
-# add this to .zshrc: "source ~/.git-flow-completion.zsh"
+# add this to .zshrc: "source $HOME/.git-flow-completion.zsh"
