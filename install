@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Install program and dependencies, if doesn't yet exist.
 evnDependencies="git-core tig"
