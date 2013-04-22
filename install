@@ -1,16 +1,24 @@
 #!/bin/bash
 
 # Install program and dependencies, if doesn't yet exist.
-evnDependencies="git-core tig"
+evnDependencies="git-core"
 for evnDependency in $evnDependencies; do
 	if [[ -z `command -v ${evnDependency}` ]]; then
 		sudo apt-get install -y ${evnDependency}
 	fi
 done
 
+cd /usr/local/share/ &&
+sudo git clone https://github.com/jonas/tig.git &&
+cd tig &&
+sudo make configure &&
+sudo ./configure &&
+sudo make &&
+sudo ln -s $PWD/tig /usr/bin/tig
+
 # Link configurations
 ln -s $HOME/.git.d/.gitconfig $HOME/.gitconfig
-ln -s $HOME/.git.d/.tig.rc $HOME/.tig.rc
+ln -s $HOME/.git.d/.tigrc $HOME/.tigrc
 
 # Install libraries
 sudo apt-get install git-flow
