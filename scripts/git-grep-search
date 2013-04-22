@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Finds commits that introduced or removed a given string
 # $1 - the string to search for
 # $2 - look only in a specific file

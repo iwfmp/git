@@ -10,10 +10,13 @@
 	excludesfile = ~/git/.global-gitignore
 
 [merge]
-	tool = vimdiff
+	tool = meld
 
 [branch]
 	autosetupmerge = true
+
+[diff]
+	tool = meld
 
 [color "branch"]
 	current = yellow reverse
