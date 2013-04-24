@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install program and dependencies, if doesn't yet exist.
-evnDependencies="git-core"
+evnDependencies="git-core git-flow"
 for evnDependency in $evnDependencies; do
 	if [[ -z `command -v ${evnDependency}` ]]; then
 		sudo apt-get install -y ${evnDependency}
@@ -19,8 +19,5 @@ sudo ln -s $PWD/tig /usr/bin/tig
 # Link configurations
 ln -s $HOME/.git.d/.gitconfig $HOME/.gitconfig
 ln -s $HOME/.git.d/.tigrc $HOME/.tigrc
-
-# Install libraries
-sudo apt-get install git-flow
 
 # add this to .zshrc: "source $HOME/.git-flow-completion.zsh"
