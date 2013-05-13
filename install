@@ -8,7 +8,7 @@ for evnDependency in $evnDependencies; do
 	fi
 done
 
-cd /usr/local/share/ &&
+cd /usr/local/src/ &&
 sudo git clone https://github.com/jonas/tig.git &&
 cd tig &&
 sudo make configure &&
