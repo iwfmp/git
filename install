@@ -8,12 +8,11 @@ for evnDependency in $evnDependencies; do
 	fi
 done
 
-cd /usr/local/src/ &&
-sudo git clone https://github.com/jonas/tig.git &&
-cd tig &&
-sudo make configure &&
-sudo ./configure &&
-sudo make &&
+cd /usr/local/src/
+sudo git clone https://github.com/jonas/tig.git
+cd tig
+sudo ./autogen.sh && sudo ./configure && sudo make && sudo make clean install
+
 sudo ln -s $PWD/tig /usr/bin/tig
 
 # Link configurations
