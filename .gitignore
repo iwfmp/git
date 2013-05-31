@@ -1,2 +1,6 @@
-lib/
-
+lib/git-today
+lib/git-ftp
+lib/git-hooks
+lib/git-flow
+lib/git-flow-completion
+lib/git-scripts
