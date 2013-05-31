@@ -7,7 +7,7 @@
 
 [core]
 	editor = vim
-	excludesfile = ~/git/.global-gitignore
+	excludesfile = ~/git/init/.global-gitignore
 
 [merge]
 	tool = meld
