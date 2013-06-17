@@ -1,22 +1,23 @@
 #!/bin/bash
 
 # Install program and dependencies, if doesn't yet exist.
-evnDependencies="git-core git-flow"
+evnDependencies="git git-flow"
 for evnDependency in $evnDependencies; do
 	if [[ -z `command -v ${evnDependency}` ]]; then
 		sudo apt-get install -y ${evnDependency}
 	fi
 done
 
-cd /usr/local/src/
-sudo git clone https://github.com/jonas/tig.git
-cd tig
-sudo ./autogen.sh && sudo ./configure && sudo make && sudo make clean install
-
-sudo ln -s $PWD/tig /usr/bin/tig
+if [[ -z `command -v tig` ]]; then
+	cd /usr/local/src/
+	sudo git clone https://github.com/jonas/tig.git
+	cd tig
+	sudo ./autogen.sh && sudo ./configure && sudo make && sudo make clean install
+	sudo ln -s $PWD/tig /usr/bin/tig
+fi
 
 # Link configurations
-ln -s $HOME/.git.d/init/.gitconfig $HOME/
-ln -s $HOME/.git.d/init/.tigrc $HOME/
+ln -s $HOME/.git.d/init/.gitconfig $HOME/ > /dev/null 2>&1
+ln -s $HOME/.git.d/init/.tigrc $HOME/ > /dev/null 2>&1
 
 # add this to .zshrc: "source $HOME/.git-flow-completion.zsh"
