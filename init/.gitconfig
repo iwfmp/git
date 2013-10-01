@@ -18,6 +18,9 @@
 [diff]
 	tool = meld
 
+[color]
+	ui = true
+
 [color "branch"]
 	current = yellow reverse
 	local = yellow
