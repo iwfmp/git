@@ -2,12 +2,9 @@
 	name = Elad Rom
 	email = webdev@eladrom.org
 
-[push]
-	default = tracking
-
 [core]
 	editor = vim
-	excludesfile = ~/git/init/.global-gitignore
+	excludesfile = /git/.gitignore_global
 
 [merge]
 	tool = meld
