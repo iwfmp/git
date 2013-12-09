@@ -11,6 +11,7 @@
 
 [branch]
 	autosetupmerge = true
+	autosetuprebase = always
 
 [diff]
 	tool = meld
