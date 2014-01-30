@@ -3,7 +3,7 @@
 	email = webdev@eladrom.org
 
 [core]
-	editor = vim
+	editor = nano
 	excludesfile = /git/.gitignore_global
 
 [merge]
