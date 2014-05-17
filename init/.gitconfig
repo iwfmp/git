@@ -34,14 +34,14 @@
 	# undoing
 	unstage = reset HEAD --
 	undo-push = git push -f origin HEAD^:master
-	detach = checkout HEAD^0 #go to a detached-HEAD mode
+	detach = checkout HEAD^0 ## Go to a detached-HEAD mode
 
 	# stashing
-	stash-unapply = !git stash show -p | git apply -R #unapply the most recent stash
-	stash-show = !git show $(git stash list | cut -d":"  -f 1) #shows the contents of each stash with one command.
+	stash-unapply = !git stash show -p | git apply -R ## Unapply the most recent stash
+	stash-show = !git show $(git stash list | cut -d":"  -f 1) ## Shows the contents of each stash with one command.
 
 	# Information gathering
 	current = rev-parse --abbrev-ref HEAD
-	resolve = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`" #3
-	subup = submodule foreach git pull origin master #update all submodules in a git repo
-	subclean = submodule foreach git clean -fd #update all submodules in a git repo
+	resolve = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+	subup = submodule foreach git pull origin master ## Update all submodules in a git repo
+	subclean = submodule foreach git clean -fd ## Update all submodules in a git repo
