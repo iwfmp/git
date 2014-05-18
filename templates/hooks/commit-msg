@@ -6,7 +6,7 @@ message = File.read(message_file)
 $regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\(([a-zA-Z]+)\)\:(.{0,50})$/
 
 if !$regex.match(message)
-puts "Your message is not formatted correctly.
+puts "[POLICY] Your message is not formatted correctly.
 Key points of a well formed commit message:
 - Must have a summary line.
 - Summary line must be 70 characters or less.
