@@ -3,7 +3,7 @@
 
 editor = ENV['EDITOR'] != 'none' ? ENV['EDITOR'] : 'vim'
 message_file = ARGV[0]
-$regex = /^([Ff]eat|[Ff]ix|[Dd]ocs|[Ss]tyle|[Rr]efactor|[Tt]est|[Cc]hore|[Ii]mprove)\(([a-zA-Z]+)\)\:(.{0,50})$/
+$regex = /^([Ff]eat|[Ff]ix|[Dd]ocs|[Ss]tyle|[Rr]efactor|[Tt]est|[Cc]hore|[Ii]mprove)\(([a-zA-Z]+)\)\:(.*)$/
 
 def check_format_rules(line_number, line)
   real_line_number = line_number + 1
