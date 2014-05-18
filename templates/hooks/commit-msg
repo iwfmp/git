@@ -1,22 +1,27 @@
 #!/usr/bin/ruby
 # Encoding: utf-8
 
+editor = ENV['EDITOR'] != 'none' ? ENV['EDITOR'] : 'vim'
 message_file = ARGV[0]
-message = File.read(message_file)
-$regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\(([a-zA-Z]+)\)\:(.{0,50})$/
+$regex = /^([Ff]eat|[Ff]ix|[Dd]ocs|[Ss]tyle|[Rr]efactor|[Tt]est|[Cc]hore|[Ii]mprove)\(([a-zA-Z]+)\)\:(.{0,50})$/
 
-if !$regex.match(message)
-puts "[POLICY] Your message is not formatted correctly.
-Key points of a well formed commit message:
-- Must have a summary line.
-- Summary line must be 70 characters or less.
-- Summary line syntax must be '<type>(<scope>): <subject>'.
-- Should have a well thought out and meaningful description.
-- No line in the description should be over 80 characters long.
+def check_format_rules(line_number, line)
+  real_line_number = line_number + 1
+  return "Error #{real_line_number}: Summary line must be 70 characters or less." if line_number == 0 && line.length > 70
+  return "Error #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if line_number == 0 && !$regex.match(line)
+  return "Error #{real_line_number}: Second line should be empty." if line_number == 1 && line.length > 0
+  (return "Error #{real_line_number}: No line should be over 80 characters long." if line.length > 80) unless line[0,1]  == '#'
+  false
+end
 
-Format breakdown:
-- First line is summary.
-- Second line is empty.
-- Third line starts the in-depth description."
-exit 1
+errors = []
+File.open(message_file, 'r').each_with_index do |line, line_number|
+  e = check_format_rules line_number, line.strip
+  errors.push e if e
+end
+
+unless errors.empty?
+  puts '[POLICY] Invalid git commit message format.'
+  errors.each { |error| puts "#    #{error}" }
+  exit 1
 end
