@@ -2,6 +2,9 @@
 	name = Elad Rom
 	email = webdev@eladrom.org
 
+[init]
+  templatedir = ~/.git.d/templates
+
 [core]
 	editor = nano
 	excludesfile = /git/.gitignore_global
