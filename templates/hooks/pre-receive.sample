@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# Encoding: utf-8
+# Source: http://git-scm.com/book/en/Customizing-Git-An-Example-Git-Enforced-Policy#Server-Side-Hook
+# Source: https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
+
+$oldrev, $newrev, $refname = STDIN.read.split(" ")
+$user = ENV['USER']
+$message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve|revert|merge)\((\w+)\)\:\s(.{10,})$/
+$missed_revs = `git rev-list #{$oldrev}..#{$newrev}`.split("\n")
+$errors = []
+
+puts "Enforcing Policies... \n(#{$refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+# Enforce custom commit-message format rules
+# -------------------------------------------------------------------------------------------------------------------------------------
+def check_format_rules(rev, line_number, line)
+  real_line_number = line_number + 1
+  return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if line_number == 0 && line.length > 70
+  return "Commit #{rev}, line #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if line_number == 0 && !$message_regex.match(line)
+  return "Commit #{rev}, line #{real_line_number}: Second line should be empty." if line_number == 1 && line.length > 0
+  (return "Commit #{rev}, line #{real_line_number}: No line should be over 80 characters long." if line.length > 80) unless line[0,1]  == '#'
+  false
+end
+
+def check_message_format
+  $missed_revs.each do |rev|
+    commit_message = `git cat-file commit #{rev} | sed '1,/^$/d'`.split("\n")
+    commit_message.each_with_index do |line, line_number|
+      error = check_format_rules rev[0,6], line_number, line.strip
+      $errors.push error if error
+    end
+  end
+end
+check_message_format
+
+unless $errors.empty?
+  puts '[POLICY] Invalid git commit message format.'
+  $errors.each { |error| puts "#    #{error}" }
+  exit 1
+end

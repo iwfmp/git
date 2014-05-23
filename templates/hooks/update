@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+# Encoding: utf-8
+
+$oldrev, $newrev, $refname = STDIN.read.split(" ")
+$real_refname = `git rev-parse --abbrev-ref #{$refname} 2> /dev/null`.strip
+$merge_commits = `git rev-list --merges #{$oldrev}..#{$newrev} 2> /dev/null`.strip
+$parent_commit = `git rev-parse #{$newrev}\^1`
+$ancestor_branch = `git show-branch | grep '*' | grep -v '#{$real_refname}' | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'`
+
+puts "Enforcing Policies... \n(#{$real_refname}) (#{$oldrev[0,6]}) (#{$newrev[0,6]})"
+puts "#{$ancestor_branch[4,6]}"
+
+$errors = []
+def check_branch_policy()
+  $errors.push "Branch #{$real_refname}: Only Version, Hotfix and Master branches are allowed to be pushed upstream." if !$real_refname.match(/^(version\/[1-9.]+|hotfix\/[1-9.]+|master)/)
+  $errors.push "Branch #{$real_refname}: Master branch accepts only non-forwarded merge commits." if $real_refname.match('master') && (!$merge_commits.match($newrev) || !$parent_commit.match($oldrev))
+  $errors.push "Branch #{$real_refname}: Version and Hotfix branches accept only fast-forward/rebased commits." if !$real_refname.match('master') && !$merge_commits.empty?
+  # $errors.push "Branch #{$real_refname}: Version and Hotfix branches must diverge from Master branch directly." if !$real_refname.match('master') && !$ancestor_branch[4,6].match('master')
+  # $errors.push "Branch #{$real_refname}: Master branch must only be merged into from Version or Hotfix branches." if $real_refname.match('master')
+  false
+end
+check_branch_policy
+
+unless $errors.empty?
+  puts '[POLICY] Invalid git branch rules.'
+  $errors.each { |error| puts "#    #{error}" }
+  exit 1
+end
+
+# Hotfix branch must be merged both to master and rebased to current version branch
+# semVer control on version/hotfix/tags
+# Hotfix/* versioning format: 1.0.0-1
+
+# SemVer Sanity Checks
+# => SemVer Hotfix < Version
+# => SemVer Hotfix_upstream < Hotfix_current
+# => SemVer Version_upstream < Version_current
+
+# def resolve_hotfix()
+#   git checkout master
+#   git merge --no-ff $real_refname
+#   git tag $real_refname_tag
+
+#   git rebase $current_version_branch} $real_refname
+#   git checkout $current_version_branch
+#   git reset --hard $real_refname
+#   git push $current_version_branch
+
+#   git branch -D $real_refname} && git branch -D origin/$real_refname
+#   git branch --merged master | grep -v "master" | xargs -n 1 git branch -d
+# end

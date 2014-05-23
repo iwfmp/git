@@ -5,7 +5,6 @@
 [init]
   templatedir = ~/.git.d/templates
 
-
 [core]
 	editor = nano
 	excludesfile = /git/.gitignore_global
@@ -13,9 +12,8 @@
 [merge]
 	tool = meld
 
-[branch]
-	autosetupmerge = true
-	autosetuprebase = always
+[pull]
+  rebase = preserve
 
 [diff]
 	tool = meld
