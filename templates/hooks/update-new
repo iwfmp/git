@@ -5,27 +5,32 @@ oldrev, newrev, refname = STDIN.read.split(" ")
 # short_refname = refname.chomp("refs/heads/") => Why doesn't this work?!
 short_refname = refname[11..-1]
 merge_commits = `git rev-list --merges #{oldrev}..#{newrev}`.strip
-parent_commit = `git rev-parse #{newrev}\^1`
-# ancestor_branch = `git show-branch | grep '*' | grep -v '#{short_refname}' | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'`
+# parent_commit = `git rev-parse #{newrev}\^1`
+has_diverged = `git rev-list --all --not $(git rev-list --all \^#{newrev})` # http://stackoverflow.com/a/5724488
+$some_var = `git rev-list master..#{newrev}`
 
 puts "Enforcing Policies... \n(#{short_refname}) (#{oldrev[0,6]}) (#{newrev[0,6]})"
+puts "YES YES"
+puts "#{has_diverged}"
+puts "YES YES"
+puts "#{$some_var}"
 
-def check_branch_policy(oldrev,newrev,short_refname,merge_commits,parent_commit,ancestor_branch)
+def check_branch_policy(oldrev,newrev,short_refname,merge_commits,has_diverged)
   errors = []
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
     !short_refname[/^(version\/[1-9.]+|hotfix\/[1-9.]+|master)/]
   if short_refname['master']
     errors << "Master branch accepts only non-forwarded merge commits." if
-      !merge_commits[newrev] || !parent_commit[oldrev]
+      !has_diverged[newrev]
   else
     errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
-      !merge_commits.empty?
-    # errors << "Version and Hotfix branches must diverge from Master branch directly." if
-      # !ancestor_branch[4,6]['master']
+      has_diverged.empty?
+    errors << "Version and Hotfix branches must diverge from Master branch directly." if
+      !has_diverged.match()
   end
   errors
 end
-errors = check_branch_policy(oldrev,newrev,short_refname,merge_commits,parent_commit,ancestor_branch)
+errors = check_branch_policy(oldrev,newrev,short_refname,merge_commits,has_diverged)
 
 unless errors.empty?
   puts '[POLICY] Invalid git branch rules.'
