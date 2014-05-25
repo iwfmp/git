@@ -3,7 +3,8 @@
 
 oldrev, newrev, refname = STDIN.read.split(" ")
 # short_refname = refname.chomp("refs/heads/") => Why doesn't this work?!
-short_refname = refname[11..-1]
+short_refname = `git symbolic-ref #{refname}`([/[^\/]*$/]).chomp
+# short_refname = refname[11..-1]
 merge_commits = `git rev-list --merges #{oldrev}..#{newrev}`.strip
 parent_commit = `git rev-parse #{newrev}\^1`
 # ancestor_branch = `git show-branch | grep '*' | grep -v '#{short_refname}' | head -n1 | sed 's/.*\[\(.*\)\].*/\1/' | sed 's/[\^~].*//'`

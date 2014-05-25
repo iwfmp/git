@@ -1,43 +1,39 @@
 #!/usr/bin/env ruby
 # Encoding: utf-8
 
-oldrev, newrev, refname = STDIN.read.split(" ")
-# TODO: short_refname = refname.chomp("refs/heads/") => Why doesn't this work?!
-short_refname = refname[11..-1]
-merge_commits = `git rev-list --merges #{oldrev}..#{newrev}`.strip
-# TODO: Why doesn't this work?!
-unique_revs = `git rev-list --all --not $(git rev-list --all ^#{newrev})` # http://stackoverflow.com/a/5724488
-missed_revs = `git rev-list #{oldrev}..#{newrev}`
+@oldrev, @newrev, @refname = STDIN.read.split(" ")
+@short_refname = @refname[11..-1]
+@merge_commits = `git rev-list --merges #{@oldrev}..#{@newrev} 2> /dev/null`.strip
+@parent_commit = `git rev-parse #{@newrev}\^1`
+@unique_revs = `git rev-list master..#{@newrev} --not $(git rev-list --all ^#{@newrev}) 2> /dev/null` # http://stackoverflow.com/a/5724488
+@missed_revs = `git rev-list master..#{@newrev} 2> /dev/null`
 
-puts "Enforcing Policies... \n(#{short_refname}) (#{oldrev[0,6]}) (#{newrev[0,6]})"
+puts "Enforcing Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
-def check_branch_policy(oldrev,newrev,short_refname,merge_commits,unique_revs,missed_revs)
+def check_branch_policy
   errors = []
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
-    !short_refname[/^(version\/[1-9.]+|hotfix\/[1-9.]+|master)/]
-  if short_refname['master']
-    # Master should have only one unique commit each time - the merge commit (newrev).
+    !@short_refname[/^(version\/[1-9.]+|hotfix\/[1-9.]+|master)/]
+  if @short_refname['master']
+    # Master should have only one unique commit each time - the merge commit (@newrev).
     # => Otherwise, commits were made directly (==only) on master.
-    # Also, must have at least 3 commits - oldrev to diverge from, a regular commit, and newrev as a merge.
-    # => Edge case - When only one commit is made directly on master and pushed, which the first rule doesn't catch.
     errors << "Master branch accepts only non-forwarded merge commits, one at a time." if
-      #!merge_commits[newrev] || !parent_commit[oldrev]
-      !unique_revs[newrev] && missed_revs.count > 2
+      !@merge_commits[@newrev] || !@parent_commit[@oldrev]
   else
     # If not empty, it means there's a merge commit - whereas there shouldn't be.
     errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
-      !merge_commits.empty?
+      !@merge_commits.empty?
     # If not equal, it means at least one commit is reachable from another ref - meaning it was diverged.
     errors << "Version and Hotfix branches must diverge from Master branch directly." if
-      !unique_revs[missed_revs]
+      !@unique_revs[@missed_revs]
   end
   errors
 end
-errors = check_branch_policy(oldrev,newrev,short_refname,unique_revs,missed_revs)
+errors = check_branch_policy
 
 unless errors.empty?
   puts '[POLICY] Invalid git branch rules.'
-  errors.each { |error| puts "#    Branch #{short_refname}: #{error}" }
+  errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
   exit 1
 end
 
@@ -52,14 +48,14 @@ end
 
 # def resolve_hotfix()
 #   git checkout master
-#   git merge --no-ff $short_refname
-#   git tag $short_refname_tag
+#   git merge --no-ff $@short_refname
+#   git tag $@short_refname_tag
 
-#   git rebase $current_version_branch} $short_refname
+#   git rebase $current_version_branch} $@short_refname
 #   git checkout $current_version_branch
-#   git reset --hard $short_refname
+#   git reset --hard $@short_refname
 #   git push $current_version_branch
 
-#   git branch -D $short_refname} && git branch -D origin/$short_refname
+#   git branch -D $@short_refname} && git branch -D origin/$@short_refname
 #   git branch --merged master | grep -v "master" | xargs -n 1 git branch -d
 # end
