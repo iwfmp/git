@@ -1,0 +1,40 @@
+# There are only 3 available upstream branches: Master, Version/* and Hotfix/*.
+- Version/<Some-branch>
+- <Some-branch>
+
+# Master branch accepts only non-forwarded merge commits, one at a time.
+- One commit is made directly on master.
+- A few commits are made directly on master.
+- A few commits and a merge commit afterwards.
+- A merge commit and a few commits afterwards.
+- A few commits, a merge commit and another few commits afterwards.
+- Two merge commits are made on master.
+
+# Version and Hotfix branches accept only fast-forward/rebased commits.
+- Version branch is rebased on top of Hotfix (Change pushed history).
+- Version branch is rebased on top of Hotfix (Change pushed history) after being merged to master.
+- A branch is merged into Version branch (Merge commit).
+- A branch is merged into Version branch (Merge commit) after being merged to master.
+- A commit is made on Version after being merged to master.
+
+# Master branch must only be merged into from Version or Hotfix branches.
+- A <Some-branch> branch is merged into master.
+
+# Version and Hotfix branches must diverge from Master branch directly.
+- Version branch made on top of current Version branch
+- Hotfix branch made on top of current Version branch
+
+# Only one Version/Hotfix branch is allowed upstream at a time - TODO
+- If another Version branch is made from current master.
+- If another Version branch is made after the previous was merged to master.
+- If there's no Hotfix and two Version branches.
+
+# Hotfix branch should be both merged to Master and rebased on top latest Version - TODO
+- If hotfix is rebased under latest Version
+- If hotfix is merged to Version
+- If hotfix in neither merged or rebased to Version
+
+# Various
+- In case of creation/deletion of branches
+- Should branches only be created/deleted upstream?
+- when no branch is created yet.
