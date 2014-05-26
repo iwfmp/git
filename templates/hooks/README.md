@@ -2,7 +2,7 @@
 This is a repository of both server and client git hooks,
 all of which are designed to enforce a certain policy of working properly with git.
 
-All the global plugins, using the wonderful git-hooks program (https://github.com/icefox/git-hooks)
+Consider using [Git Hooks](https://github.com/icefox/git-hooks) for easier management.
 
 ## Installation
 Since hooks are not distributed automatically via git,
@@ -50,6 +50,7 @@ Enforce Branch Management Conventions:
 
 ### pre-receive.message
 See [commit-msg hook](#commit-msg)
+
 Server implementation to enforce commit-msg hook.
 
 ### pre-receive.version
