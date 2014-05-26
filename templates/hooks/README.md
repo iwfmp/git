@@ -11,8 +11,8 @@ there should be a local template directory to pull the hooks from for each proje
 This is done by:
 
 ``` bash
-git clone git@git.codeoasis.com/git $HOME/.git.d/templates
-git config --global init.templatedir '~/.git.d/templates'
+git clone https://github.com/iwfmp/git $HOME/.git.d
+git config --global init.templatedir '$HOME/.git.d/templates'
 ```
 
 Then these cases apply:
