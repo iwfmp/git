@@ -1,18 +1,12 @@
-git-today:
+today:
   repo: https://github.com/notbenh/git-today.git
   path: lib
-git-ftp:
+ftp:
   repo: https://github.com/resmo/git-ftp.git
   path: lib
-git-hooks:
+hooks:
   repo: https://github.com/icefox/git-hooks.git
   path: lib
-git-flow:
-  repo: https://github.com/nvie/gitflow.git
-  path: lib
-git-flow-completion:
-  repo: https://github.com/bobthecow/git-flow-completion.git
-  path: lib
-git-scripts:
+scripts:
   repo: https://github.com/jwiegley/git-scripts
   path: lib
