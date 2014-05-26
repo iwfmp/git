@@ -9,7 +9,7 @@
 @missed_revs = `git rev-list #{@oldrev}..#{@newrev}`.split("\n")
 @errors = []
 
-puts "Enforcing Policies... \n(#{@refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+puts "Enforcing Message Policies... \n(#{@refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
