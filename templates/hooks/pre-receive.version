@@ -1,0 +1,22 @@
+# Hotfix branch must be merged both to master and rebased to current version branch
+# semVer control on version/hotfix/tags
+# Hotfix/* versioning format: 1.0.0-1
+
+# SemVer Sanity Checks
+# => SemVer Hotfix < Version
+# => SemVer Hotfix_upstream < Hotfix_current
+# => SemVer Version_upstream < Version_current
+
+# def resolve_hotfix()
+#   git checkout master
+#   git merge --no-ff $@short_refname
+#   git tag $@short_refname_tag
+
+#   git rebase $current_version_branch} $@short_refname
+#   git checkout $current_version_branch
+#   git reset --hard $@short_refname
+#   git push $current_version_branch
+
+#   git branch -D $@short_refname} && git branch -D origin/$@short_refname
+#   git branch --merged master | grep -v "master" | xargs -n 1 git branch -d
+# end
