@@ -4,29 +4,40 @@
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
 @zero = "0000000000000000000000000000000000000000"
-@merge_commits = `git rev-list --merges #{@oldrev}..#{@newrev} 2> /dev/null`.strip
-@parent_commit = `git rev-parse #{@newrev}\^1 2> /dev/null`
-@unique_revs = `git rev-list master..#{@newrev} --not $(git rev-list --all ^#{@newrev}) 2> /dev/null` # http://stackoverflow.com/a/5724488
-@missed_revs = `git rev-list master..#{@newrev} 2> /dev/null`
-@rebased_revs = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix)`.split("\n").grep(/\-/).join("\n").tr("- ","")
-@hotfix_revs = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-
 puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+
+@merge_commits = `git rev-list --merges #{@oldrev}..#{@newrev} 2>/dev/null`.strip
+@parent_commit = `git rev-parse #{@newrev}\^1 2>/dev/null`
+@rebased_revs  = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix) 2>/dev/null`.split("\n").grep(/\-/).join("\n").tr("- ","")
+@hotfix_revs   = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix) 2>/dev/null`
+@unique_revs   = `git rev-list master..#{@newrev} --not $(git rev-list --all ^#{@newrev}) 2>/dev/null` # http://stackoverflow.com/a/5724488
+@diverged_revs = `git rev-list master..#{@newrev} 2>/dev/null`
+
 
 def check_branch_policy
   errors = []
-  errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
+  errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
+    !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
+
   if @short_refname['master']
+    # If initial commit, and ONLY 1, allow it.
+    exit 0 if @oldrev[@zero] && @parent_commit[@newrev]
     # Master should have only one unique commit each time - the merge commit (@newrev).
-    errors << "Master branch accepts only non-forwarded merge commits, one at a time." if !@merge_commits[@newrev] || !@parent_commit[@oldrev]
+    errors << "Master branch accepts only non-forwarded merge commits, one at a time." if
+      !@merge_commits[@newrev] || !@parent_commit[@oldrev]
     # Hotfix refs should also be on version branch - if not, it means it wasn't properly rebased.
-    errors << "Hotfix branch should be both merged to master and rebased to latest version." if (@rebased_revs.empty? && !@hotfix_revs.empty?) || !@rebased_revs[@hotfix_revs]
+    errors << "Hotfix branch should be both merged to master and rebased to latest version." if
+      (@rebased_revs.empty? && !@hotfix_revs.empty?) || !@rebased_revs[@hotfix_revs]
+
   else
     # If not empty, it means there's a merge commit - whereas there shouldn't be.
-    errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if !@merge_commits.empty?
+    errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
+      !@merge_commits.empty?
     # If not equal, it means at least one commit is reachable from another ref - meaning it was diverged.
-    errors << "Version and Hotfix branches must diverge from Master branch directly." if !@unique_revs[@missed_revs]
+    errors << "Version and Hotfix branches must diverge from Master branch directly." if
+      !@unique_revs[@diverged_revs]
   end
+
   errors
 end
 errors = check_branch_policy

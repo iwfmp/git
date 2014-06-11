@@ -4,25 +4,32 @@
 # Source: https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
-@user = ENV['USER']
-@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve|revert|merge)\((\w+)\)\:\s(.{10,})@/
-@missed_revs = `git rev-list #{@oldrev}..#{@newrev}`.split("\n")
-@errors = []
+@short_refname = @refname[11..-1]
+@zero = "0000000000000000000000000000000000000000"
+puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
-puts "Enforcing Message Policies... \n(#{@refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+@oldrev        = `git merge-base master #{@newrev} 2>/dev/null` if @oldrev[@zero]
+@missed_revs   = `git rev-list #{@oldrev}..#{@newrev} 2>/dev/null`.split("\n")
+@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})@/
+
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
 # -------------------------------------------------------------------------------------------------------------------------------------
 def check_format_rules(rev, line_number, line)
   real_line_number = line_number + 1
-  return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if line_number == 0 && line.length > 70
-  return "Commit #{rev}, line #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if line_number == 0 && !@message_regex.match(line)
-  return "Commit #{rev}, line #{real_line_number}: Second line should be empty." if line_number == 1 && line.length > 0
-  (return "Commit #{rev}, line #{real_line_number}: No line should be over 80 characters long." if line.length > 80) unless line[0,1]  == '#'
+  return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if
+    line_number == 0 && line.length > 70
+  return "Commit #{rev}, line #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if
+    line_number == 0 && !@message_regex.match(line)
+  return "Commit #{rev}, line #{real_line_number}: Second line should be empty." if
+    line_number == 1 && line.length > 0
+  return "Commit #{rev}, line #{real_line_number}: No line should be over 80 characters long." if
+    line.length > 80
   false
 end
 
+@errors = []
 def check_message_format
   @missed_revs.each do |rev|
     commit_message = `git cat-file commit #{rev} | sed '1,/^@/d'`.split("\n")
