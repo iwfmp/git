@@ -5,6 +5,7 @@
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
+@zero = "0000000000000000000000000000000000000000"
 puts "Enforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
 # A sure way fire to get all the refs, even if a branch was just created
@@ -14,8 +15,8 @@ puts "Enforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
 # -------------------------------------------------------------------------------------------------------------------------------------
-# I don't care about the message in master branch.
-exit 0 if @short_refname['master']
+# I don't care about the message in master branch, or if the branch is being deleted.
+exit 0 if @short_refname['master'] || @newrev[@zero]
 
 def check_format_rules(rev, line_number, line)
   real_line_number = line_number + 1
