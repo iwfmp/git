@@ -10,7 +10,7 @@ puts "Enforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@
 
 # A sure way fire to get all the refs, even if a branch was just created
 @missed_revs   = `git rev-list #{@newrev} ^#{@oldrev} 2>/dev/null || git rev-list #{@newrev}`.split("\n")
-@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+\.-)\)\:\s(.{10,})@/
+@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})/
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules

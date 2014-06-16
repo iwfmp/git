@@ -8,10 +8,15 @@ puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@n
 
 @merge_commits = `git rev-list --merges #{@oldrev}..#{@newrev} 2>/dev/null`.strip
 @parent_commit = `git rev-parse #{@newrev}\^1 2>/dev/null`
+
 @rebased_revs  = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix) 2>/dev/null`.split("\n").grep(/\-/).join("\n").tr("- ","")
 @hotfix_revs   = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix) 2>/dev/null`
+
 @unique_revs   = `git rev-list #{@newrev} --not $(git rev-list --all ^#{@newrev}) 2>/dev/null` # http://stackoverflow.com/a/5724488
-@diverged_revs = `git rev-list master..#{@newrev} 2>/dev/null`
+@diverged_revs = `git rev-list #{@newrev} 2>/dev/null`
+
+# Exit if the branch is being deleted.
+exit 0 if @newrev[@zero]
 
 def check_branch_policy
   errors = []
