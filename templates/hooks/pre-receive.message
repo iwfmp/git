@@ -5,12 +5,11 @@
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
-@zero = "0000000000000000000000000000000000000000"
-puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+puts "Enforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
-@oldrev        = `git merge-base master #{@newrev} 2>/dev/null` if @oldrev[@zero]
-@missed_revs   = `git rev-list #{@oldrev}..#{@newrev} 2>/dev/null`.split("\n")
-@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})@/
+# A sure way fire to get all the refs, even if a branch was just created
+@missed_revs   = `git rev-list #{@newrev} ^#{@oldrev} 2>/dev/null || git rev-list #{@newrev}`.split("\n")
+@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+\.-)\)\:\s(.{10,})@/
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
