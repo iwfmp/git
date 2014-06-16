@@ -12,7 +12,6 @@ puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@n
 @missed_revs   = `git rev-list #{@oldrev}..#{@newrev} 2>/dev/null`.split("\n")
 @message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})@/
 
-
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +31,7 @@ end
 @errors = []
 def check_message_format
   @missed_revs.each do |rev|
-    commit_message = `git cat-file commit #{rev} | sed '1,/^@/d'`.split("\n")
+    commit_message = `git cat-file commit #{rev} | sed '1,/^$/d'`.split("\n")
     commit_message.each_with_index do |line, line_number|
       error = check_format_rules rev[0,6], line_number, line.strip
       @errors.push error if error
