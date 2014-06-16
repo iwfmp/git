@@ -15,6 +15,9 @@ puts "Enforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@n
 # -------------------------------------------------------------------------------------------------------------------------------------
 # Enforce custom commit-message format rules
 # -------------------------------------------------------------------------------------------------------------------------------------
+# I don't care about the message in master branch.
+exit 0 if @short_refname['master']
+
 def check_format_rules(rev, line_number, line)
   real_line_number = line_number + 1
   return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if
