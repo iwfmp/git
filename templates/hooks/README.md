@@ -44,7 +44,7 @@ Enforce Branch Management Conventions:
 - Version and Hotfix branches accept only fast-forward/rebased commits.
 - Version and Hotfix branches must diverge from Master branch directly.
 - Hotfix and Version branches can not be worked on after beign merged to master.
-- Hotfix and Version branches can only be deleted after being merged to master.
+- Hotfix and Version branches can only be deleted after being fully merged to master - LOCAL ONLY.
 
 - Master branch must only be merged into from Version or Hotfix branches - TODO
 - Only one Version/Hotfix branch is allowed upstream at a time - TODO
