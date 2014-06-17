@@ -17,6 +17,13 @@ puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{
 # A sure way fire to get all the merged refs, even if a branch was just created.
 @merge_commits   = `git rev-list --merges #{@newrev} \^#{@oldrev} 2>/dev/null || git rev-list --merges #{@newrev} \^master 2>/dev/null`
 @parent_commit   = `git rev-parse #{@newrev}\^1 2>/dev/null`
+
+@current_version = `git for-each-ref --format="%(refname)" refs/heads/version 2>/dev/null`
+@current_hotfix  = `git for-each-ref --format="%(refname)" refs/heads/hotfix 2>/dev/null`
+@rebased_revs    = `git cherry #{@current_version} #{@current_hotfix} 2>/dev/null`
+@hotfix_revs     = `git rev-list --reverse master..#{@current_hotfix} 2>/dev/null`
+@valid_merge     = `git rev-list --merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) -1 2>/dev/null`
+
 @unique_revs     = `git rev-list --no-merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) 2>/dev/null`
 @diverged_revs   = `git rev-list #{@newrev} \^master 2>/dev/null`
 @branch_merged   = `git rev-list --merges #{@refname}..master 2>/dev/null`
@@ -39,11 +46,11 @@ def check_branch_policy
     errors << "Master branch accepts only non-forwarded merge commits, one at a time." if
       !@merge_commits[@newrev] || !@parent_commit[@oldrev]
     # (3) Hotfix refs should also be on version branch - if not, it means it wasn't properly rebased.
-    # rebased_revs  = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-    # hotfix_revs   = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-    # errors << "Hotfix branch should be both merged to Master and rebased on top latest Version." if
-    #   (rebased_revs.empty? && !hotfix_revs.empty?) || !rebased_revs[hotfix_revs]
-    # errors << "Master branch can only be merged into from Version or Hotfix branches." if
+    errors << "Hotfix branch should be both merged to Master and rebased on top latest Version." if
+      (@rebased_revs.empty? && !@hotfix_revs.empty?) || !@rebased_revs[@hotfix_revs]
+    # (4) If not empty, either version/hotfix is not fully updated or a merge was made locall from a different branch.
+    errors << "Master branch can only be merged into from a pushed Version or Hotfix branches." if
+      !@unique_revs.empty?
 
   else
     # (1) If not empty, it means there's a merge commit - whereas there shouldn't be.
@@ -75,3 +82,5 @@ unless errors.empty?
   errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
   exit 1
 end
+
+exit 1

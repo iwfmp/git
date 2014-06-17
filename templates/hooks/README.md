@@ -46,10 +46,8 @@ Enforce Branch Management Conventions:
 - Hotfix and Version branches can not be worked on after beign merged to master.
 - Hotfix and Version branches can only be deleted after being fully merged to master - LOCAL ONLY.
 - Only one Version/Hotfix branch is allowed upstream at a time.
-
-- Master branch must only be merged into from Version or Hotfix branches - TODO
-- Hotfix branch should be both merged to Master and rebased on top latest Version  - TODO
-- Push -f is not allowed - TODO
+- Master branch must only be merged into from Version or Hotfix branches.
+- Hotfix branch should be both merged to Master and rebased on top latest Version.
 
 ### pre-receive.message
 See [commit-msg hook](#commit-msg)
