@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Encoding: utf-8
 
-# Description  : Git hook for branch policy, according to angular commit format.
+# Description  : Git hook for branch policy.
 # Usage        :
 # Dependencies :
 # Example      :
@@ -16,7 +16,7 @@ puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{
 
 # A sure way fire to get all the merged refs, even if a branch was just created.
 @merge_commits = `git rev-list --merges #{@newrev} \^#{@oldrev} 2>/dev/null || git rev-list --merges #{@newrev} \^master 2>/dev/null`
-@branch_merged = `git rev-list --merges #{@newrev}..master 2>/dev/null`
+@branch_merged = `git rev-list --merges #{@refname}..master 2>/dev/null`
 @parent_commit = `git rev-parse #{@newrev}\^1 2>/dev/null`
 @unique_revs   = `git rev-list --no-merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) 2>/dev/null`
 @diverged_revs = `git rev-list #{@newrev} \^master 2>/dev/null`
@@ -55,6 +55,9 @@ def check_branch_policy
     # (3) If not equal, it means at least one commit is reachable from another ref - meaning it was diverged. See links.
     errors << "Version and Hotfix branches must diverge from Master branch directly." if
       !@unique_revs[@diverged_revs]
+    # (4) Allow deleting a branch only if it has already been merged to master.
+    errors << "Version and Hotfix branches can not be deleted before being fully merged." if
+      @newrev[@zero] && @branch_merged.empty?
   end
 
   errors
@@ -66,3 +69,5 @@ unless errors.empty?
   errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
   exit 1
 end
+
+exit 1
