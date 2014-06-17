@@ -76,6 +76,8 @@ errors = check_branch_policy
 
 # If new branch, ONLY 1 commit, and no other errors - always allow it.
 exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && errors.empty?
+# Also, if a tag, allow it.
+exit 0 if @refname.include?("tags")
 
 unless errors.empty?
   puts '[POLICY] Invalid git branch rules.'
