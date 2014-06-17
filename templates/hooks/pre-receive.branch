@@ -84,5 +84,3 @@ unless errors.empty?
   errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
   exit 1
 end
-
-exit 1
