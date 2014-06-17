@@ -7,7 +7,7 @@
 # Example      :
 # Notes        :
 # Source       : http://stackoverflow.com/a/5724488
-# Source       :
+# Source       : https://coderwall.com/p/fytgoq
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
