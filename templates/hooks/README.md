@@ -45,9 +45,9 @@ Enforce Branch Management Conventions:
 - Version and Hotfix branches must diverge from Master branch directly.
 - Hotfix and Version branches can not be worked on after beign merged to master.
 - Hotfix and Version branches can only be deleted after being fully merged to master - LOCAL ONLY.
+- Only one Version/Hotfix branch is allowed upstream at a time.
 
 - Master branch must only be merged into from Version or Hotfix branches - TODO
-- Only one Version/Hotfix branch is allowed upstream at a time - TODO
 - Hotfix branch should be both merged to Master and rebased on top latest Version  - TODO
 - Push -f is not allowed - TODO
 
