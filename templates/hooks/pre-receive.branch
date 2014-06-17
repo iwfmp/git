@@ -29,7 +29,8 @@ def check_branch_policy
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
     !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
   # If new branch, and if ONLY 1 commit, always allow it.
-  exit 0 if @oldrev[@zero] && @parent_commit[@newrev]
+  # If the above rule applies, obviously.
+  exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && !errors
 
   if @short_refname['master']
     # (1) If newrev equals to zero, it means someone is trying to delete master branch.
