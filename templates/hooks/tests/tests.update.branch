@@ -34,7 +34,4 @@
 - If hotfix is merged to Version
 - If hotfix in neither merged or rebased to Version
 
-# Various
-- In case of creation/deletion of branches
-- Should branches only be created/deleted upstream?
-- when no branch is created yet.
+# Hotfix and Version branches can not be worked on after beign merged to master - TODO.

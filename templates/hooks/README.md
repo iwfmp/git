@@ -42,10 +42,13 @@ Enforce Branch Management Conventions:
 - There are only 3 available upstream branches: Master, Version/* and Hotfix/*.
 - Master branch accepts only non-forwarded merge commits, one at a time.
 - Version and Hotfix branches accept only fast-forward/rebased commits.
-- Master branch must only be merged into from Version or Hotfix branches.
 - Version and Hotfix branches must diverge from Master branch directly.
+- Hotfix and Version branches can not be worked on after beign merged to master.
+- Hotfix and Version branches can only be deleted after being merged to master.
+
+- Master branch must only be merged into from Version or Hotfix branches - TODO
 - Only one Version/Hotfix branch is allowed upstream at a time - TODO
-- Hotfix branch should be both merged to Master and rebased ont top latest Version  - TODO
+- Hotfix branch should be both merged to Master and rebased on top latest Version  - TODO
 - Push -f is not allowed - TODO
 
 ### pre-receive.message
