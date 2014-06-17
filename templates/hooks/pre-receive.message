@@ -1,73 +1,56 @@
 #!/usr/bin/env ruby
 # Encoding: utf-8
 
-# Description  : Git hook for branch policy.
+# Description  : Git hook for message policy, according to angular commit format.
 # Usage        :
 # Dependencies :
 # Example      :
 # Notes        :
-# Source       : http://stackoverflow.com/a/5724488
-# Source       : https://coderwall.com/p/fytgoq
+# Source       : http://git-scm.com/book/en/Customizing-Git-An-Example-Git-Enforced-Policy#Server-Side-Hook
+# Source       : https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
 @zero = "0000000000000000000000000000000000000000"
-puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+puts "\nEnforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
-# A sure way fire to get all the merged refs, even if a branch was just created.
-@merge_commits = `git rev-list --merges #{@newrev} \^#{@oldrev} 2>/dev/null || git rev-list --merges #{@newrev} \^master 2>/dev/null`
-@branch_merged = `git rev-list --merges #{@refname}..master 2>/dev/null`
-@parent_commit = `git rev-parse #{@newrev}\^1 2>/dev/null`
-@unique_revs   = `git rev-list --no-merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) 2>/dev/null`
-@diverged_revs = `git rev-list #{@newrev} \^master 2>/dev/null`
+# A sure way fire to get all the refs, even if a branch was just created.
+@missed_revs   = `git rev-list #{@newrev} ^#{@oldrev} 2>/dev/null || git rev-list #{@newrev} 2>/dev/null`.split("\n")
+@message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})/
 
 # -------------------------------------------------------------------------------------------------------------------------------------
-# Enforce branch format rules
+# Enforce commit-message format rules
 # -------------------------------------------------------------------------------------------------------------------------------------
-def check_branch_policy
-  errors = []
-  errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
-    !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
-  # If new branch, fits naming convention, and if ONLY 1 commit, always allow it.
-  exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && errors.empty?
+# I don't care if the branch is being deleted.
+exit 0 if @newrev[@zero]
 
-  if @short_refname['master']
-    # (1) If newrev equals to zero, it means someone is trying to delete master branch.
-    errors << "Master branch can not be deleted. WTF?" if
-      @newrev[@zero]
-    # (2) Master should have only one unique commit each time - the merge commit (@newrev).
-    # Covers: More than one merge; More than one commit; Non-merge commit.
-    errors << "Master branch accepts only non-forwarded merge commits, one at a time." if
-      !@merge_commits[@newrev] || !@parent_commit[@oldrev]
-    # (3) Hotfix refs should also be on version branch - if not, it means it wasn't properly rebased.
-    # rebased_revs  = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-    # hotfix_revs   = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-    # errors << "Hotfix branch should be both merged to master and rebased to latest version." if
-    #   (rebased_revs.empty? && !hotfix_revs.empty?) || !rebased_revs[hotfix_revs]
-
-  else
-    # (1) If not empty, it means there's a merge commit - whereas there shouldn't be.
-    errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
-      !@merge_commits.empty?
-    # (2) If not empty (and was not just created) it means it has already been merged.
-    errors << "Branch has already been merged. Please check to see if a new branch exists." if
-      !@branch_merged.empty? && !@newrev[@zero]
-    # (3) If not equal, it means at least one commit is reachable from another ref - meaning it was diverged. See links.
-    errors << "Version and Hotfix branches must diverge from Master branch directly." if
-      !@unique_revs[@diverged_revs]
-    # (4) Allow deleting a branch only if it has already been merged to master.
-    errors << "Version and Hotfix branches can not be deleted before being fully merged." if
-      @newrev[@zero] && @branch_merged.empty?
-  end
-
-  errors
+def check_format_rules(rev, line_number, line)
+  real_line_number = line_number + 1
+  return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if
+    line_number == 0 && line.length > 70
+  return "Commit #{rev}, line #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if
+    line_number == 0 && !@message_regex.match(line)
+  return "Commit #{rev}, line #{real_line_number}: Second line should be empty." if
+    line_number == 1 && line.length > 0
+  return "Commit #{rev}, line #{real_line_number}: No line should be over 80 characters long." if
+    line.length > 80
+  false
 end
-errors = check_branch_policy
 
-unless errors.empty?
-  puts '[POLICY] Invalid git branch rules.'
-  errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
+@errors = []
+def check_message_format
+  @missed_revs.each do |rev|
+    commit_message = `git cat-file commit #{rev} | sed '1,/^$/d'`.split("\n")
+    commit_message.each_with_index do |line, line_number|
+      error = check_format_rules rev[0,6], line_number, line.strip
+      @errors.push error if error
+    end
+  end
+end
+check_message_format
+
+unless @errors.empty?
+  puts '[POLICY] Invalid git commit message format.'
+  @errors.each { |error| puts "#    #{error}" }
   exit 1
 end
-
-exit 1
