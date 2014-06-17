@@ -47,7 +47,6 @@ def check_branch_policy
 
   else
     # (1) If not empty, it means there's a merge commit - whereas there shouldn't be.
-    # Covers: Merging hotfix/version/master/custom branches.
     errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
       !@merge_commits.empty?
     # (2) If not empty (and was not just created) it means it has already been merged.
