@@ -29,8 +29,6 @@ def check_branch_policy
   errors = []
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
     !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
-  # If new branch, fits naming convention, and if ONLY 1 commit, always allow it.
-  exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && !@instance_exists && errors.empty?
 
   if @short_refname['master']
     # (1) If newrev equals to zero, it means someone is trying to delete master branch.
@@ -43,10 +41,9 @@ def check_branch_policy
     # (3) Hotfix refs should also be on version branch - if not, it means it wasn't properly rebased.
     # rebased_revs  = `git cherry $(git for-each-ref --format="%(refname)" refs/heads/version) $(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
     # hotfix_revs   = `git rev-list --reverse master..$(git for-each-ref --format="%(refname)" refs/heads/hotfix)`
-    # errors << "Hotfix branch should be both merged to master and rebased to latest version." if
+    # errors << "Hotfix branch should be both merged to Master and rebased on top latest Version." if
     #   (rebased_revs.empty? && !hotfix_revs.empty?) || !rebased_revs[hotfix_revs]
-    # errors << "Master branch can only be merged into from Version or Hotfix branches" if
-    # errors << "Hotfix branch should be both merged to Master and rebased on top latest Version" if
+    # errors << "Master branch can only be merged into from Version or Hotfix branches." if
 
   else
     # (1) If not empty, it means there's a merge commit - whereas there shouldn't be.
@@ -56,10 +53,10 @@ def check_branch_policy
     errors << "Branch has already been merged. Please check to see if a new branch exists." if
       !@branch_merged.empty? && !@newrev[@zero]
     # (3) If not equal, it means at least one commit is reachable from another ref - meaning it was diverged. See links.
-    errors << "Version and Hotfix branches must diverge from Master branch directly." if
+    errors << "Version/Hotfix branches must diverge from Master branch directly." if
       !@unique_revs[@diverged_revs]
     # (4) Allow deleting a branch only if it has already been merged to master.
-    errors << "Version and Hotfix branches can not be deleted before being fully merged." if
+    errors << "Version/Hotfix branches can not be deleted before being fully merged to Master." if
       @newrev[@zero] && @branch_merged.empty?
     # (5) If trying to create a branch, and another instance already exists, shut down everything.
     errors << "Only one Version/Hotfix branch is allowed upstream at a time." if
@@ -69,6 +66,9 @@ def check_branch_policy
   errors
 end
 errors = check_branch_policy
+
+# If new branch, ONLY 1 commit, and no other errors - always allow it.
+exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && errors.empty?
 
 unless errors.empty?
   puts '[POLICY] Invalid git branch rules.'
