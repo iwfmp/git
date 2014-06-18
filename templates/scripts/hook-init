@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Description  : Initialize git hooks in all repos - downstream or upstream
+# Description  : (Re)Initialize git hooks in all repos - downstream or upstream.
 # Usage        :
 # Dependencies :
 # Example      :
@@ -24,7 +24,6 @@ DEST_REPOS=`find $REPO_DIR -type f |     # List all files in the destination.
 
 for REPO in $DEST_REPOS; do
   rm ${REPO}${TEST_BRANCH}
-  cd ${REPO}
-  [[ $USER == "git" ]] && git init --bare
-  [[ $USER != "git" ]] && git init
+  [[ $USER == "git" ]] && git init --bare ${REPO}.git
+  [[ $USER != "git" ]] && git init ${REPO}
 done
