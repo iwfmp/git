@@ -10,32 +10,42 @@
 # Source       : (Disable force pushing)[http://stackoverflow.com/a/17064462]
 # Source       : https://coderwall.com/p/fytgoq
 
+# =====================================================================================================================================
+# Helper Variables
+# =====================================================================================================================================
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
 @zero = "0000000000000000000000000000000000000000"
-puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+@current_version = `git for-each-ref --format="%(refname)" refs/heads/version 2>/dev/null`
+@current_hotfix  = `git for-each-ref --format="%(refname)" refs/heads/hotfix 2>/dev/null`
+@other_branchs   = `git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname} 2>/dev/null`
 
+# =====================================================================================================================================
+# Sanity Check Variables
+# =====================================================================================================================================
 # A sure way fire to get all the merged refs, even if a branch was just created.
 @merge_commits   = `git rev-list --merges #{@newrev} \^#{@oldrev} 2>/dev/null || git rev-list --merges #{@newrev} \^master 2>/dev/null`
 @parent_commit   = `git rev-parse #{@newrev}\^1 2>/dev/null`
 @is_force_push   = `git merge-base #{@oldrev} #{@newrev} 2>/dev/null`
 
-@current_version = `git for-each-ref --format="%(refname)" refs/heads/version 2>/dev/null`
-@current_hotfix  = `git for-each-ref --format="%(refname)" refs/heads/hotfix 2>/dev/null`
 @rebased_revs    = `git cherry #{@current_version} #{@current_hotfix} 2>/dev/null`
 @hotfix_revs     = `git rev-list --reverse master..#{@current_hotfix} 2>/dev/null`
-@valid_merge     = `git rev-list --merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) -1 2>/dev/null`
 
-@unique_revs     = `git rev-list --no-merges #{@newrev} --not $(git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname}) 2>/dev/null`
+@unique_revs     = `git rev-list --no-merges #{@newrev} --not #{@other_branchs} 2>/dev/null`
 @diverged_revs   = `git rev-list #{@newrev} \^master 2>/dev/null`
 @branch_merged   = `git rev-list --merges #{@refname}..master 2>/dev/null`
 @instance_exists = `git branch -a`[/(version\/[0-9.]+|hotfix\/[0-9.]+)/]
 
-# -------------------------------------------------------------------------------------------------------------------------------------
-# Enforce branch format rules
-# -------------------------------------------------------------------------------------------------------------------------------------
+# =====================================================================================================================================
+# Enforce branch policy rules
+# =====================================================================================================================================
+puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+
 def check_branch_policy
   errors = []
+
+# General Branch Policies
+# -------------------------------------------------------------------------------------------------------------------------------------
   # (1) Check for branch naming convention using a regex.
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
     !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
@@ -43,6 +53,8 @@ def check_branch_policy
   errors << "Force push is not allowed into this repository." if
     !@is_force_push[@oldrev]
 
+# Master Branch Policies
+# -------------------------------------------------------------------------------------------------------------------------------------
   if @short_refname['master']
     # (1) If newrev equals to zero, it means someone is trying to delete master branch.
     errors << "Master branch can not be deleted. WTF?" if
@@ -58,6 +70,8 @@ def check_branch_policy
     errors << "Master branch can only be merged into from a pushed Version or Hotfix branches." if
       !@unique_revs.empty?
 
+# Version/Hotfix Branch Policies
+# -------------------------------------------------------------------------------------------------------------------------------------
   else
     # (1) If not empty, it means there's a merge commit - whereas there shouldn't be.
     errors << "Version and Hotfix branches accept only fast-forward/rebased commits." if
@@ -80,11 +94,17 @@ def check_branch_policy
 end
 errors = check_branch_policy
 
+# =====================================================================================================================================
+# Necessary Fallbacks
+# =====================================================================================================================================
 # If new branch, ONLY 1 commit, and no other errors - always allow it.
 exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && errors.empty?
-# Also, if a tag, allow it. Later will be automated, thus removed.
+# Also, if a tag, allow it. Later will be automated at the server, thus removed.
 exit 0 if @refname.include?("tags")
 
+# =====================================================================================================================================
+# Output Errors, If They Exist
+# =====================================================================================================================================
 unless errors.empty?
   puts '[POLICY] Invalid git branch rules.'
   errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
