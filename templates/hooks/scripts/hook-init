@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Description  : Initialize git hooks in all repos - downstream or upstream
+# Usage        :
+# Dependencies :
+# Example      :
+# Notes        :
+# Source       : http://stevenharman.net/git-clean-delete-already-merged-branches
+
+set -x
+
+TEST_BRANCH=".git/hooks/pre-receive.branch"
+
+REPO_DIR="/var/www/"
+if [[ $USER == "git" ]]; then
+  REPO_DIR="/home/git/repositories/"
+fi
+
+find $REPO_DIR -type f |               # List all files in the destination.
+grep "$TEST_BRANCH" |                  # List only repos in which the custom hooks are present.
+grep -Fv "vendor" |                    # Remove entries with vendors - we don't care about them.
+sed "s|$TEST_BRANCH||g"                # Get the directory base name
