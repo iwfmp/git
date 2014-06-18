@@ -9,14 +9,22 @@
 
 set -x
 
-TEST_BRANCH=".git/hooks/pre-receive.branch"
+TEST_BRANCH=".git/hooks/pre-receive.*"
 
 REPO_DIR="/var/www/"
 if [[ $USER == "git" ]]; then
   REPO_DIR="/home/git/repositories/"
 fi
 
-find $REPO_DIR -type f |               # List all files in the destination.
-grep "$TEST_BRANCH" |                  # List only repos in which the custom hooks are present.
-grep -Fv "vendor" |                    # Remove entries with vendors - we don't care about them.
-sed "s|$TEST_BRANCH||g"                # Get the directory base name
+DEST_REPOS=`find $REPO_DIR -type f |     # List all files in the destination.
+  grep "$TEST_BRANCH" |                  # List only repos in which the custom hooks are present.
+  grep -Fv "vendor" |                    # Remove entries with vendors - we don't care about them.
+  sed "s|$TEST_BRANCH||g" |              # Get the directory base name.
+  uniq`                                  # List only Unique entries.
+
+for REPO in $DEST_REPOS; do
+  rm ${REPO}${TEST_BRANCH}
+  cd ${REPO}
+  [[ $USER == "git" ]] && git init --bare
+  [[ $USER != "git" ]] && git init
+done
