@@ -9,20 +9,24 @@
 # Source       : http://git-scm.com/book/en/Customizing-Git-An-Example-Git-Enforced-Policy#Server-Side-Hook
 # Source       : https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
 
+# =====================================================================================================================================
+# Helper Variables
+# =====================================================================================================================================
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
 @short_refname = @refname[11..-1]
 @zero = "0000000000000000000000000000000000000000"
-puts "\nEnforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
+# =====================================================================================================================================
+# Sanity Check Variables
+# =====================================================================================================================================
 # A sure way fire to get all the refs, even if a branch was just created.
 @missed_revs   = `git rev-list #{@newrev} ^#{@oldrev} 2>/dev/null || git rev-list #{@newrev} 2>/dev/null`.split("\n")
 @message_regex = /^(feat|fix|docs|style|refactor|test|chore|improve)\((\w+)\)\:\s(.{10,})/
 
-# -------------------------------------------------------------------------------------------------------------------------------------
-# Enforce commit-message format rules
-# -------------------------------------------------------------------------------------------------------------------------------------
-# I don't care if the branch is being deleted.
-exit 0 if @newrev[@zero]
+# =====================================================================================================================================
+# Enforce Message Policy Rules
+# =====================================================================================================================================
+puts "\nEnforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
 def check_format_rules(rev, line_number, line)
   real_line_number = line_number + 1
@@ -49,6 +53,15 @@ def check_message_format
 end
 check_message_format
 
+# =====================================================================================================================================
+# Necessary Fallbacks
+# =====================================================================================================================================
+# I don't care, if the branch is being deleted.
+exit 0 if @newrev[@zero]
+
+# =====================================================================================================================================
+# Output Errors, If They Exist
+# =====================================================================================================================================
 unless @errors.empty?
   puts '[POLICY] Invalid git commit message format.'
   @errors.each { |error| puts "#    #{error}" }

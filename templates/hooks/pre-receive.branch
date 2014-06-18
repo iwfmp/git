@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Encoding: utf-8
 
-# Description  : Git hook for branch policy.
+# Description  : Git hook for branch policy, designed for agile programming.
 # Usage        :
 # Dependencies :
 # Example      :
@@ -37,7 +37,7 @@
 @instance_exists = `git branch -a`[/(version\/[0-9.]+|hotfix\/[0-9.]+)/]
 
 # =====================================================================================================================================
-# Enforce branch policy rules
+# Enforce Branch Policy Rules
 # =====================================================================================================================================
 puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
 
