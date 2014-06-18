@@ -18,7 +18,7 @@
 @zero = "0000000000000000000000000000000000000000"
 @current_version = `git for-each-ref --format="%(refname)" refs/heads/version 2>/dev/null`
 @current_hotfix  = `git for-each-ref --format="%(refname)" refs/heads/hotfix 2>/dev/null`
-@other_branchs   = `git for-each-ref --format="%(refname)" refs/heads | grep -Fv #{@refname} 2>/dev/null`
+@other_branchs   = `git for-each-ref --format="%(refname)" refs/heads 2>/dev/null | grep -Fv #{@refname}`
 
 # =====================================================================================================================================
 # Sanity Check Variables
