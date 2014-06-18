@@ -48,6 +48,7 @@ Enforce Branch Management Conventions:
 - Only one Version/Hotfix branch is allowed upstream at a time.
 - Master branch must only be merged into from Version or Hotfix branches.
 - Hotfix branch should be both merged to Master and rebased on top latest Version.
+- Refuse push --force into repository.
 
 ### pre-receive.message
 See [commit-msg hook](#commit-msg)

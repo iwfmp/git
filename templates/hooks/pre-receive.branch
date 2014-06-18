@@ -6,7 +6,8 @@
 # Dependencies :
 # Example      :
 # Notes        :
-# Source       : http://stackoverflow.com/a/5724488
+# Source       : (Find unqiue refs of a branch)[http://stackoverflow.com/a/5724488]
+# Source       : (Disable force pushing)[http://stackoverflow.com/a/17064462]
 # Source       : https://coderwall.com/p/fytgoq
 
 @oldrev, @newrev, @refname = STDIN.read.split(" ")
@@ -17,6 +18,7 @@ puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{
 # A sure way fire to get all the merged refs, even if a branch was just created.
 @merge_commits   = `git rev-list --merges #{@newrev} \^#{@oldrev} 2>/dev/null || git rev-list --merges #{@newrev} \^master 2>/dev/null`
 @parent_commit   = `git rev-parse #{@newrev}\^1 2>/dev/null`
+@is_force_push   = `git merge-base #{@oldrev} #{@newrev} 2>/dev/null`
 
 @current_version = `git for-each-ref --format="%(refname)" refs/heads/version 2>/dev/null`
 @current_hotfix  = `git for-each-ref --format="%(refname)" refs/heads/hotfix 2>/dev/null`
@@ -34,8 +36,12 @@ puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{
 # -------------------------------------------------------------------------------------------------------------------------------------
 def check_branch_policy
   errors = []
+  # (1) Check for branch naming convention using a regex.
   errors << "Only Version, Hotfix and Master branches are allowed to be pushed upstream." if
     !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
+  # (2) Check if someone is trying to force push a branch into remote repo.
+  errors << "Force push is not allowed into this repository." if
+    !@is_force_push[@oldrev]
 
   if @short_refname['master']
     # (1) If newrev equals to zero, it means someone is trying to delete master branch.
@@ -76,7 +82,7 @@ errors = check_branch_policy
 
 # If new branch, ONLY 1 commit, and no other errors - always allow it.
 exit 0 if @oldrev[@zero] && @parent_commit[@newrev] && errors.empty?
-# Also, if a tag, allow it.
+# Also, if a tag, allow it. Later will be automated, thus removed.
 exit 0 if @refname.include?("tags")
 
 unless errors.empty?
