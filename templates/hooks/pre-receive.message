@@ -68,6 +68,6 @@ exit 0 if @newrev[@zero]
 # =====================================================================================================================================
 unless @errors.empty?
   puts '[POLICY] Invalid git commit message format.'.cyan
-  @errors.each { |error| puts "#{error[0]}".yellow + " #{error[1]}".red }
+  @errors.each { |error| puts "#{error[0]} ".yellow + "#{error[1]}".red }
   exit 1
 end
