@@ -8,6 +8,9 @@
 # Notes        :
 # Source       : http://git-scm.com/book/en/Customizing-Git-An-Example-Git-Enforced-Policy#Server-Side-Hook
 # Source       : https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
+# Source       : (http://stackoverflow.com/a/1489233)[Colored Output]
+
+require 'colorize'
 
 # =====================================================================================================================================
 # Helper Variables
@@ -26,17 +29,18 @@
 # =====================================================================================================================================
 # Enforce Message Policy Rules
 # =====================================================================================================================================
-puts "\nEnforcing Message Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+puts "Enforcing Message Policies...".cyan
+puts "(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})".cyan
 
 def check_format_rules(rev, line_number, line)
   real_line_number = line_number + 1
-  return "Commit #{rev}, line #{real_line_number}: Summary line must be 70 characters or less." if
+  return ["Commit #{rev}, line #{real_line_number}:", "Summary line must be 70 characters or less."] if
     line_number == 0 && line.length > 70
-  return "Commit #{rev}, line #{real_line_number}: Summary line syntax must be '<type>(<scope>): <subject>'" if
+  return ["Commit #{rev}, line #{real_line_number}:", "Summary line syntax must be '<type>(<scope>): <subject>'"] if
     line_number == 0 && !@message_regex.match(line)
-  return "Commit #{rev}, line #{real_line_number}: Second line should be empty." if
+  return ["Commit #{rev}, line #{real_line_number}:", "Second line should be empty."] if
     line_number == 1 && line.length > 0
-  return "Commit #{rev}, line #{real_line_number}: No line should be over 80 characters long." if
+  return ["Commit #{rev}, line #{real_line_number}:", "No line should be over 80 characters long."] if
     line.length > 80
   false
 end
@@ -63,7 +67,7 @@ exit 0 if @newrev[@zero]
 # Output Errors, If They Exist
 # =====================================================================================================================================
 unless @errors.empty?
-  puts '[POLICY] Invalid git commit message format.'
-  @errors.each { |error| puts "#    #{error}" }
+  puts '[POLICY] Invalid git commit message format.'.cyan
+  @errors.each { |error| puts "#{error[0]}".yellow + " #{error[1]}".red }
   exit 1
 end

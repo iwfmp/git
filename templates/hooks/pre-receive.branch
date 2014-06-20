@@ -9,6 +9,9 @@
 # Source       : (Find unqiue refs of a branch)[http://stackoverflow.com/a/5724488]
 # Source       : (Disable force pushing)[http://stackoverflow.com/a/17064462]
 # Source       : https://coderwall.com/p/fytgoq
+# Source       : http://kpumuk.info/ruby-on-rails/colorizing-console-ruby-script-output/
+
+require 'colorize'
 
 # =====================================================================================================================================
 # Helper Variables
@@ -39,7 +42,8 @@
 # =====================================================================================================================================
 # Enforce Branch Policy Rules
 # =====================================================================================================================================
-puts "\nEnforcing Branch Policies... \n(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})"
+puts "Enforcing Branch Policies...".cyan
+puts "(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})".cyan
 
 def check_branch_policy
   errors = []
@@ -106,7 +110,7 @@ exit 0 if @refname.include?("tags")
 # Output Errors, If They Exist
 # =====================================================================================================================================
 unless errors.empty?
-  puts '[POLICY] Invalid git branch rules.'
-  errors.each { |error| puts "#    Branch #{@short_refname}: #{error}" }
+  puts '[POLICY] Invalid git branch rules.'.cyan
+  errors.each { |error| puts "Branch #{@short_refname}: ".yellow + "#{error}".red }
   exit 1
 end
