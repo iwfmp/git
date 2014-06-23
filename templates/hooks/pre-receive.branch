@@ -43,7 +43,7 @@ def check_branch_policy
 # -------------------------------------------------------------------------------------------------------------------------------------
   # (1) Check if someone is trying to force push a branch into remote repo. Unless new branch.
   errors << "Force push is not allowed into this repository." if
-    !@is_force_push[@oldrev] && !@oldrev[@zero] && !@newrev[@zero]
+    !@is_force_push[@oldrev]
 
 # Master Branch Policies
 # -------------------------------------------------------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ def check_branch_policy
       !@merge_commits.empty?
     # (2) If not empty (and was not just created) it means it has already been merged. Unless being deleted.
     errors << "Branch has already been merged. Please check to see if a new branch exists." if
-      !@branch_merged.empty? && !@newrev[@zero]
+      !@branch_merged.empty?
   end
 
   errors
