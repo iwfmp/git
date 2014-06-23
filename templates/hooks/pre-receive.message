@@ -8,7 +8,7 @@
 # Notes        :
 # Source       : http://git-scm.com/book/en/Customizing-Git-An-Example-Git-Enforced-Policy#Server-Side-Hook
 # Source       : https://lists.fedoraproject.org/pipermail/devel/2013-September/189126.html
-# Source       : (http://stackoverflow.com/a/1489233)[Colored Output]
+# Source       : [http://stackoverflow.com/a/1489233](Colored Output)
 
 require 'colorize'
 

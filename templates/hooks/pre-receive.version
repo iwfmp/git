@@ -6,8 +6,8 @@
 # Dependencies :
 # Example      :
 # Notes        :
-# Source       : (SemVer)[http://semver.org/]
-# Source       : (SemVer Control)[https://stackoverflow.com/questions/10228073]
+# Source       : [SemVer](http://semver.org/)
+# Source       : [SemVer Control](https://stackoverflow.com/questions/10228073)
 
 require 'semver'
 

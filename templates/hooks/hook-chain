@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Runs all executable pre-commit-* hooks and exits after,
-# if any of them was not successful.
-#
-# Based on
-# http://osdir.com/ml/git/2009-01/msg00308.html
-# http://stackoverflow.com/a/8734391
+# Description  : Runs all executable <hook-name>.* hooks and exits after.
+# Usage        :
+# Dependencies :
+# Example      :
+# Notes        :
+# Source       : [Chaining git hooks](http://stackoverflow.com/a/8734391)
 
 data=$(cat)
 exitcodes=()

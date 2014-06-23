@@ -26,6 +26,7 @@ Then these cases apply:
 Enforce Commit Message Conventions:
 
 - Summary line syntax must be `<type>(<scope>): <subject>`.
+- Summary line subject must have at least 10 characters.
 - Summary line must be 70 characters or less.
 - Second line should be empty.
 - No other line should be over 80 characters long.
@@ -64,3 +65,10 @@ Designed to allow chaining of hooks for a smart separation of behavior.
 The hook should be symlinked as the desired hook <E.g. update>,
 after which every <hook-name>.* will iterated through and applied when the hook is run.
 Basically the same design as the (soon-to-be?) gitlab update hook.
+
+## Frequently Asked Questions
+### I get message error. How can I rewrite the commit message?
+If there's only one commit, using `git commit --amend HEAD` to change the commit message.
+If there are several commits, 1st use the commit-msg local hook to help you see it beforehand.
+Afterwards, use `rebase -i <commit-hash>`, and change all relevant commits to "edit".
+To understand more, read [How to change git commit messages](http://www.jacopretorius.net/2013/05/amend-multiple-commit-messages-with-git.html)

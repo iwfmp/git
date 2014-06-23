@@ -6,9 +6,9 @@
 # Dependencies :
 # Example      :
 # Notes        :
-# Source       : (Find unqiue refs of a branch)[http://stackoverflow.com/a/5724488]
-# Source       : (Disable force pushing)[http://stackoverflow.com/a/17064462]
-# Source       : (Find merged branches)[https://coderwall.com/p/fytgoq]
+# Source       : [Find unqiue refs of a branch](http://stackoverflow.com/a/5724488)
+# Source       : [Disable force pushing](http://stackoverflow.com/a/17064462)
+# Source       : [Find merged branches](https://coderwall.com/p/fytgoq)
 
 require 'colorize'
 
@@ -54,7 +54,7 @@ def check_branch_policy
     !@short_refname[/^(version\/[0-9.]+|hotfix\/[0-9.]+|master)/]
   # (2) Check if someone is trying to force push a branch into remote repo. Unless new branch.
   errors << "Force push is not allowed into this repository." if
-    !@is_force_push[@oldrev] && !@oldrev[@zero]
+    !@is_force_push[@oldrev] && !@oldrev[@zero] && !@newrev[@zero]
 
 # Master Branch Policies
 # -------------------------------------------------------------------------------------------------------------------------------------
