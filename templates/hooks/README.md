@@ -72,3 +72,25 @@ If there's only one commit, using `git commit --amend HEAD` to change the commit
 If there are several commits, 1st use the commit-msg local hook to help you see it beforehand.
 Afterwards, use `rebase -i <commit-hash>`, and change all relevant commits to "edit".
 To understand more, read [How to change git commit messages](http://www.jacopretorius.net/2013/05/amend-multiple-commit-messages-with-git.html)
+
+### I always get merge commits when I pull. How can I change that?
+There are basically 3 ways to rebase.
+
+#### Fetch everything and rebase what you want.
+git fetch
+git rebase origin/<some-branch>
+
+#### Use the command pull --rebase.
+git pull --rebase origin <some-branch>
+
+#### Add it to gitconfig to automatically do it for you.
+git config --global pull.rebase true
+
+### K, but I already did the merge and now it doesn't let me push. What now?
+First of all, you have to go back in history.
+Since you didn't yet push your changes, that's ok.
+You do it using git reset --hard <commit-sha>,
+whereas <commit-sha> is the last commit YOU did before trying to pull.
+
+You can find out the <commit-sha> in all sorts of way, the easiest being using tig.
+after you reset hard, just pull and rebase as explained above.
