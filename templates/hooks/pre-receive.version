@@ -10,6 +10,7 @@
 # Source       : [SemVer Control](https://stackoverflow.com/questions/10228073)
 
 require 'semver'
+require 'colorize'
 
 # =====================================================================================================================================
 # Helper Variables
@@ -24,61 +25,62 @@ require 'semver'
 # =====================================================================================================================================
 # Sanity Check Variables
 # =====================================================================================================================================
-@merged_from = version if `git rev-list --merges #{@current_version}..master 2>/dev/null`
-@merged_from = hotfix if `git rev-list --merges #{@current_hotfix}..master 2>/dev/null`
+@merged_from = "version" if `git rev-list --merges #{@current_version}..master 2>/dev/null`
+@merged_from = "hotfix" if `git rev-list --merges #{@current_hotfix}..master 2>/dev/null`
+@parent_commit   = `git rev-parse #{@newrev}\^1 2>/dev/null`
 
 # =====================================================================================================================================
 # Enforce Message Policy Rules
 # =====================================================================================================================================
-puts "Enforcing Message Policies...".cyan
+puts "Enforcing Version Policies...".cyan
 puts "(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})".cyan
 
 # This hook only applies to master branch. Otherwise move along.
 exit 0 if !@short_refname['master']
 
+version = SemVer.new if @oldrev[@zero] && @parent_commit[@newrev]
+# version = SemVer.find
+
+puts "#{@parent_commit}"
+puts "#{@newrev}"
+puts "#{@oldrev}"
+puts "#{version}"
+
 def check_version_policy
   errors = []
 
-# Version Branch Versioning
-# -------------------------------------------------------------------------------------------------------------------------------------
-  if @merged_from['version']
-    v = SemVer.find
-    v.minor += 1
-    v.format "%M.%m.%p".to_s.save
+#   version = SemVer.find
+#   puts "#{version}"
 
-# Hotfix Branch Versioning
-# -------------------------------------------------------------------------------------------------------------------------------------
-  if @merged_from['hotfix']
+# # Version Branch Versioning
+# # -------------------------------------------------------------------------------------------------------------------------------------
+#   if @merged_from['version']
+#     v.minor += 1
+#     v.format "%M.%m.%p".to_s.save
+#     puts "something"
 
-# Otherwise, error.
-# -------------------------------------------------------------------------------------------------------------------------------------
-  else
+# # Hotfix Branch Versioning
+# # -------------------------------------------------------------------------------------------------------------------------------------
+#   if @merged_from['hotfix']
+#     puts "something"
 
-  end
+# # Otherwise, error.
+# # -------------------------------------------------------------------------------------------------------------------------------------
+#   else
+#     puts "something"
+#   end
 
-  errors
+#   errors
 end
 errors = check_version_policy
 
-# Hotfix branch must be merged both to master and rebased to current version branch
-# semVer control on version/hotfix/tags
-# Hotfix/* versioning format: 1.0.0-1
+# =====================================================================================================================================
+# Output Errors, If They Exist
+# =====================================================================================================================================
+unless errors.empty?
+  puts '[POLICY] Invalid git branch rules.'.cyan
+  errors.each { |error| puts "Branch #{@short_refname}: ".yellow + "#{error}".red }
+  exit 1
+end
 
-# SemVer Sanity Checks
-# => SemVer Hotfix < Version
-# => SemVer Hotfix_upstream < Hotfix_current
-# => SemVer Version_upstream < Version_current
-
-# def resolve_hotfix()
-#   git checkout master
-#   git merge --no-ff $@short_refname
-#   git tag $@short_refname_tag
-
-#   git rebase $current_version_branch} $@short_refname
-#   git checkout $current_version_branch
-#   git reset --hard $@short_refname
-#   git push $current_version_branch
-
-#   git branch -D $@short_refname} && git branch -D origin/$@short_refname
-#   git branch --merged master | grep -v "master" | xargs -n 1 git branch -d
-# end
+exit 1
