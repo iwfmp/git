@@ -25,8 +25,8 @@ require 'colorize'
 # =====================================================================================================================================
 # Sanity Check Variables
 # =====================================================================================================================================
-@merged_from = "version" if `git rev-list --merges #{@current_version}..master 2>/dev/null`
-@merged_from = "hotfix" if `git rev-list --merges #{@current_hotfix}..master 2>/dev/null`
+@merged_from     = "version" if `git rev-list --merges #{@current_version}..master 2>/dev/null`
+@merged_from     = "hotfix" if `git rev-list --merges #{@current_hotfix}..master 2>/dev/null`
 @parent_commit   = `git rev-parse #{@newrev}\^1 2>/dev/null`
 
 # =====================================================================================================================================
@@ -38,13 +38,14 @@ puts "(#{@short_refname}) (#{@oldrev[0,6]}) (#{@newrev[0,6]})".cyan
 # This hook only applies to master branch. Otherwise move along.
 exit 0 if !@short_refname['master']
 
-version = SemVer.new if @oldrev[@zero] && @parent_commit[@newrev]
-# version = SemVer.find
+version = SemVer.find
+version.minor += 1
+version.format "%M.%m.%p"
+version.to_s
+version.save
 
-puts "#{@parent_commit}"
-puts "#{@newrev}"
-puts "#{@oldrev}"
-puts "#{version}"
+say_and_do("git tag -a '#{version}' -m 'Tagging #{version}'")
+say_and_do("git branch feature/seksiness")
 
 def check_version_policy
   errors = []
@@ -82,5 +83,3 @@ unless errors.empty?
   errors.each { |error| puts "Branch #{@short_refname}: ".yellow + "#{error}".red }
   exit 1
 end
-
-exit 1
