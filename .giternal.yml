@@ -1,12 +1,3 @@
-today:
-  repo: https://github.com/notbenh/git-today.git
-  path: lib
-ftp:
-  repo: https://github.com/resmo/git-ftp.git
-  path: lib
-hooks:
-  repo: https://github.com/icefox/git-hooks.git
-  path: lib
-scripts:
-  repo: https://github.com/jwiegley/git-scripts
+extras:
+  repot: https://github.com/tj/git-extras.git
   path: lib
