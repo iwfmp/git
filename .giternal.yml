@@ -1,3 +1,6 @@
 extras:
   repo: https://github.com/tj/git-extras.git
   path: lib
+crypt:
+  repo: https://github.com/AGWA/git-crypt.git
+  path: lib
