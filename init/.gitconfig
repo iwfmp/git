@@ -1,9 +1,9 @@
 [user]
-  name = Elad Rom
-  email = webdev@eladrom.org
+  name = iwfmp
+  email = iwfmp@yandex.com
 
 [init]
-  templatedir = ~/.git.d/templates
+  templatedir = ~/.config/git/templates
 
 [core]
   editor = nano
