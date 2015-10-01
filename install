@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo "Creating all symbolic links for git"
-ln -sf $HOME/.congif/git/init/.gitconfig $HOME/ > /dev/null 2>&1
+ln -sf $HOME/.config/git/init/.gitconfig $HOME/ > /dev/null 2>&1
 ln -sf $HOME/.config/git/init/.tigrc $HOME/ > /dev/null 2>&1
